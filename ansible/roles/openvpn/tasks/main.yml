@@ -1,0 +1,38 @@
+---
+# tasks file for openvpn
+
+- name: Copy installation script to server
+  template:
+    src: openvpn-install.sh
+    dest: /root/openvpn-install.sh
+    mode: 755
+
+- name: Install OpenVPN with the script
+  shell: AUTO_INSTALL=y sh ./openvpn-install.sh
+
+- name: Copy Client-template file
+  template:
+    src: client-template.txt
+    dest: /etc/openvpn/client-template.txt
+  notify: Restart OpenVPN
+
+- name: Enable masquerade
+  firewalld:
+    masquerade: "true"
+    state: enabled
+    permanent: true
+
+- name: Add Rich commands 
+  command: firewall-cmd --permanent --direct --passthrough ipv4 -t nat -A POSTROUTING  -o ens192 -j MASQUERADE
+
+- name: Apply firewall rules
+  firewalld:
+    service: https
+    immediate: true
+    permanent: true
+    state: enabled
+
+- name: Reload firewalld
+  service: 
+    name: firewalld
+    state: reloaded

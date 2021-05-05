@@ -1,0 +1,2 @@
+ntp_dir: /etc/
+ntp_server_ip: 172.16.100.25

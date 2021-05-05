@@ -1,0 +1,20 @@
+---
+# tasks file for common
+
+
+- name: Install Epel and NTP packages
+  yum: 
+    name: [ "epel-release", "chrony" ]
+    state: present
+
+- name: start ntp service
+  service: 
+     name: chronyd 
+     state: started 
+     enabled: yes
+
+- name: Copy NTP config file
+  template: 
+    src: chrony.conf.j2 
+    dest: "{{ ntp_dir }}/chrony.conf"
+  notify: restart chronyd
